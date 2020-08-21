@@ -3,29 +3,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
 
-const mongoose = require('mongoose');
-
 const dotenv = require('dotenv');
 dotenv.config();
+
+const userRoutes = require('./routes/user');
 
 
 const app = express();
 
-
-// 데이터베이스 연결
-
-const dbAdress = "mongodb+srv://admin:tmdduf23@cluster0.gv7zv.mongodb.net/blog?retryWrites=true&w=majority";
-
-const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}
-
-mongoose
-    .connect(dbAdress, options)
-    .then(() => console.log("mongoDB connected ..."))
-    .catch(err => console.log(err.message));
-
+// Connect to database
+const connectDB = require('./config/db');
+connectDB();
 
 
 app.use(bodyParser.json());
@@ -33,6 +21,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(logger('dev'));
 
+app.use('/user', userRoutes);
 
 
 
