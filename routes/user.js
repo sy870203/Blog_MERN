@@ -1,5 +1,6 @@
 const express = require ('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 
 const userModel = require('../models/user');
 
@@ -58,6 +59,38 @@ router.post('/register', (req, res) => {
 // @desc log in user / returning token
 // @access Public
 router.post('/login', (req, res) => {
+
+    const { email, password } = req.body;
+    // email 유무체크 => 패스워드 체크 => return jwt(jsonWebToken)
+
+    userModel
+        .findOne({ email })
+        .then(user => {
+            if (!user) {
+                return res.status(400).json({
+                    msg: "User not found"
+                })
+            } else {
+                // password 체크 
+                bcrypt.compare(password, user.password, (err, isMatch) => {
+                    if (err || isMatch === false) {
+                        return res.status(400).json({
+                            msg: "Password incorrected"
+                        });
+                    } else {
+                        res.status(200).json({
+                            msg: "successful logged in",
+                            userInfo: user
+                        });
+                    }
+                })
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                msg: err.message
+            })
+        })
 
 })
 
