@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const gravatar = require('gravatar');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
     {
@@ -37,7 +39,33 @@ const userSchema = new mongoose.Schema(
 
 
 
+// pre(): userSchema가 실행되기 전에 실행되는 함수
+// pre(): async, await를 반드시 써야한다
+userSchema.pre('save', async function (next) {
+    try {
 
+        console.log("entered")
+
+        // avatar 생성
+        const avatar = await gravatar.url(this.email, {
+            s: '200', // size
+            r: 'pg',  // Rating
+            d: 'mm'   // Default
+        })
+        this.avatar = avatar;
+        
+        // 패스워드 암호화
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(this.password, salt);
+        this.password = passwordHash;
+
+        console.log("exited")
+        next();
+
+    } catch (error) {
+        next(error)
+    }
+});
 
 
 
