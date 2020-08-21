@@ -71,19 +71,26 @@ router.post('/login', (req, res) => {
                     msg: "User not found"
                 })
             } else {
-                // password 체크 
-                bcrypt.compare(password, user.password, (err, isMatch) => {
-                    if (err || isMatch === false) {
-                        return res.status(400).json({
-                            msg: "Password incorrected"
-                        });
-                    } else {
-                        res.status(200).json({
-                            msg: "successful logged in",
-                            userInfo: user
-                        });
-                    }
-                })
+                // // password 체크 
+                // bcrypt.compare(password, user.password, (err, isMatch) => {
+                //     if (err || isMatch === false) {
+                //         return res.status(400).json({
+                //             msg: "Password incorrected"
+                //         });
+                //     } else {
+                //         res.status(200).json({
+                //             msg: "successful logged in",
+                //             userInfo: user
+                //         });
+                //     }
+                // })
+
+                user.comparePassword(password, (err, isMatch) => {
+                    if (err || isMatch === false) throw err;
+                    res.status(200).json({
+                        success: isMatch
+                    })
+                });
             }
         })
         .catch(err => {
