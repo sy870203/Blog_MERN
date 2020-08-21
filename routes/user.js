@@ -1,6 +1,7 @@
 const express = require ('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const gravatar = require('gravatar');
 
 const userModel = require('../models/user');
 
@@ -19,8 +20,15 @@ router.post('/register', (req, res) => {
                 msg: err.message
             });
         } else {
+
+            const avatar = gravatar.url(email, {
+                s: '200', // size
+                r: 'pg',  // png
+                d: 'mm'   // Default
+            })
+
             const user = new userModel({
-                name, email, 
+                name, email, avatar, 
                 password: hash
             });
         
